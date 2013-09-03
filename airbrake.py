@@ -10,7 +10,7 @@ _DEFAULT_ENV_VARIABLES = []
 _DEFAULT_META_VARIABLES = ['HTTP_USER_AGENT', 'HTTP_COOKIE', 'REMOTE_ADDR',
                            'SERVER_NAME', 'SERVER_SOFTWARE']
 __app_name__ = 'flask_airbrake'
-__version__ = '0.0.1'
+__version__ = '0.0.3'
 __app_url__ = 'https://github.com/kienpham2000/airbrake-flask'
 
 
@@ -33,11 +33,13 @@ class AirbrakeErrorHandler(logging.Handler):
         self.request_args = request_args
         self.request_headers = request_headers
 
-    def emit(self, exception):
-        self._send_message(self._generate_xml(exception=exception))
+    def emit(self, exception, exc_info=None):
+        self._send_message(self._generate_xml(exception=exception,
+                                              exc_info=exc_info))
 
-    def _generate_xml(self, exception):
-        _, _, trace = sys.exc_info()
+    def _generate_xml(self, exception, exc_info=None):
+        # pass in exc_info for traceback to work with gevent:
+        _, _, trace = exc_info or sys.exc_info()
 
         xml = Element('notice', dict(version='2.0'))
         SubElement(xml, 'api-key').text = self.api_key

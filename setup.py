@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name='airbrake-flask',
-    version='0.0.2',
-    author='Kien Pham',
+    version='0.0.3',
+    author='Kien Pham, Kane Kim',
     author_email='kien@sendgrid.com',
     py_modules=['airbrake'],
     url='https://github.com/kienpham2000/airbrake-flask',

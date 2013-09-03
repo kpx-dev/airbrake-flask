@@ -12,6 +12,7 @@ Example Usage with gevent
 		from flask import Flask, request
 		from airbrake import AirbrakeErrorHandler
 		import gevent
+		import sys
 		
 		@app.errorhandler(500)
 		def internal_error(error):
@@ -23,4 +24,4 @@ Example Usage with gevent
 											   request_method=request.method,
 											   request_args=request.args,
 											   request_headers=request.headers)
-					gevent.spawn(handler.emit, error)
+					gevent.spawn(handler.emit, error, sys.exc_info())
