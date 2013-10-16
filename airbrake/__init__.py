@@ -9,17 +9,15 @@ _API_URL = 'https://airbrake.io/notifier_api/v2/notices'
 _DEFAULT_ENV_VARIABLES = []
 _DEFAULT_META_VARIABLES = ['HTTP_USER_AGENT', 'HTTP_COOKIE', 'REMOTE_ADDR',
                            'SERVER_NAME', 'SERVER_SOFTWARE']
-__app_name__ = 'flask_airbrake'
-__version__ = '0.0.3'
+__app_name__ = 'airbrake-flask'
+__version__ = '0.0.4'
 __app_url__ = 'https://github.com/kienpham2000/airbrake-flask'
 
 
 class AirbrakeErrorHandler(logging.Handler):
-    def __init__(self, api_key, env_name, api_url=_API_URL,
+    def __init__(self, api_key, env_name, request, api_url=_API_URL,
                  timeout=30, env_variables=_DEFAULT_ENV_VARIABLES,
-                 meta_variables=_DEFAULT_META_VARIABLES, request_url=None,
-                 request_path=None, request_method=None, request_args=None,
-                 request_headers=None):
+                 meta_variables=_DEFAULT_META_VARIABLES):
         logging.Handler.__init__(self)
         self.api_key = api_key
         self.api_url = api_url
@@ -27,11 +25,9 @@ class AirbrakeErrorHandler(logging.Handler):
         self.env_variables = env_variables
         self.meta_variables = meta_variables
         self.timeout = timeout
-        self.request_url = request_url
-        self.request_path = request_path
-        self.request_method = request_method
-        self.request_args = request_args
-        self.request_headers = request_headers
+
+        # handle Flask request object:
+        self.request = request
 
     def emit(self, exception, exc_info=None):
         self._send_message(self._generate_xml(exception=exception,
@@ -53,25 +49,25 @@ class AirbrakeErrorHandler(logging.Handler):
         SubElement(server_env, 'environment-name').text = self.env_name
 
         request_xml = SubElement(xml, 'request')
-        SubElement(request_xml, 'url').text = self.request_url
+        SubElement(request_xml, 'url').text = self.request.url
 
-        if self.request_path:
-            SubElement(request_xml, 'component').text = self.request_path
-            SubElement(request_xml, 'action').text = self.request_method
+        if self.request.path:
+            SubElement(request_xml, 'component').text = self.request.path
+            SubElement(request_xml, 'action').text = self.request.method
 
-        if self.request_args:
+        if self.request.values:
             params = SubElement(request_xml, 'params')
-            for key in self.request_args:
-                SubElement(params, 'var', dict(key=key)).text = \
-                    str(self.request_args.get(key))
+            for key in self.request.values:
+                SubElement(params, 'var', dict(key=key)).text = (str(
+                    self.request.values.get(key)))
 
         cgi_data = SubElement(request_xml, 'cgi-data')
         for key, value in os.environ.items():
             if key in self.env_variables:
                 SubElement(cgi_data, 'var', dict(key=key)).text = str(value)
 
-        if self.request_headers:
-            for key, value in self.request_headers:
+        if self.request.headers:
+            for key, value in self.request.headers:
                 SubElement(cgi_data, 'var', dict(key=key)).text = str(value)
 
         error = SubElement(xml, 'error')

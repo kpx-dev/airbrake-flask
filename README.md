@@ -7,21 +7,34 @@ License
 -------
 Licensed under the MIT License.
 
+Testing / Coverage
+------------------
+To run tests, you need to install some required packages. Remember to activate your virtualenv first. 
+
+	# install required packages for test
+	$ pip install -e .[test]
+	
+	# run test
+	$ nosetests
+	
+	# generate coverage report
+	$ nosetests --with-coverage --cover-html
+	
+
 Example Usage with gevent
 -------------------------
-		from flask import Flask, request
-		from airbrake import AirbrakeErrorHandler
-		import gevent
-		import sys
+	from flask import Flask, request, got_request_exception
+	from airbrake import AirbrakeErrorHandler
+	import gevent
+	import sys
 		
-		@app.errorhandler(500)
-		def internal_error(error):
-    			if app.config['EXCEPTION_LOGGING']:
-					handler = AirbrakeErrorHandler(api_key=app.config['AIRBREAK_API_KEY'],
-											   env_name=ENV,
-											   request_url=request.url,
-											   request_path=request.path,
-											   request_method=request.method,
-											   request_args=request.args,
-											   request_headers=request.headers)
-					gevent.spawn(handler.emit, error, sys.exc_info())
+	app = Flask(__name__)
+	ENV = ('ENV' in os.environ and os.environ['ENV']) or 'prod'
+
+	def log_exception(error):
+		handler = AirbrakeErrorHandler(api_key="PUT_YOUR_AIRBRAKE_KEY_HERE",
+										env_name=ENV,
+										request=request)
+		gevent.spawn(handler.emit, error, sys.exc_info())
+
+    got_request_exception.connect(log_exception, app)
