@@ -1,13 +1,23 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+from airbrake import __version__, __app_url__, __app_name__
 
 setup(
-    name='airbrake-flask',
-    version='0.0.3',
+    name=__app_name__,
+    version=__version__,
     author='Kien Pham, Kane Kim',
     author_email='kien@sendgrid.com',
-    py_modules=['airbrake'],
-    url='https://github.com/kienpham2000/airbrake-flask',
+    url=__app_url__,
     license='LICENSE.txt',
     description='Airbrake client for Python Flask',
     long_description='Airbrake client for Python Flask',
-    )
+    extras_require={
+        'test': [
+            'nose',
+            'coverage',
+            'mock',
+            'blinker',
+            'Flask',
+            'gevent'
+        ]
+    },
+)
