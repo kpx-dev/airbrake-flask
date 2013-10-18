@@ -3,6 +3,8 @@ airbrake-flask
 
 Airbrake client for Python Flask Microframework
 
+[![Build Status](https://travis-ci.org/kienpham2000/airbrake-flask.png?branch=master)](https://travis-ci.org/kienpham2000/airbrake-flask)
+
 License
 -------
 Licensed under the MIT License.
