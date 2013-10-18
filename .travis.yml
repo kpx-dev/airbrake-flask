@@ -1,0 +1,10 @@
+language: python
+python:
+  - "2.7"
+# command to install dependencies
+before_install:
+ - sudo apt-get install --yes --force-yes libevent-dev
+install:
+  - pip install -e .[test]
+# command to run tests
+script: nosetests
