@@ -4,7 +4,13 @@ python:
 # command to install dependencies
 before_install:
  - sudo apt-get install --yes --force-yes libevent-dev
+
 install:
   - pip install -e .[test]
+  - pip install coveralls --use-mirrors
 # command to run tests
-script: nosetests
+script:
+  - nosetests
+  - coverage run --source=airbrake-flask setup.py nosetests
+after_success:
+  - coveralls
