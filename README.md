@@ -3,7 +3,7 @@ airbrake-flask
 
 Airbrake client for Python Flask Microframework
 
-[![Build Status](https://travis-ci.org/kienpham2000/airbrake-flask.png?branch=master)](https://travis-ci.org/kienpham2000/airbrake-flask)
+[![Build Status](https://travis-ci.org/kienpham2000/airbrake-flask.png?branch=master)](https://travis-ci.org/kienpham2000/airbrake-flask) [![Coverage Status](https://coveralls.io/repos/kienpham2000/airbrake-flask/badge.png?branch=master)](https://coveralls.io/r/kienpham2000/airbrake-flask?branch=master)
 
 License
 -------
