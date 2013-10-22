@@ -20,9 +20,15 @@ def log_exception(error):
     gevent.spawn(handler.emit, error, sys.exc_info())
 
 got_request_exception.connect(log_exception, app)
+
+Contribute
+----------
+This library is hosted on Github and you can contribute there:
+http://github.com/kienpham2000/airbrake-flask
 """
 
 classifiers = """\
+Development Status :: 5 - Production/Stable
 Environment :: Console
 Intended Audience :: Developers
 License :: OSI Approved :: MIT License
@@ -30,7 +36,6 @@ Operating System :: OS Independent
 Programming Language :: Python :: 2
 Topic :: Software Development :: Quality Assurance
 Topic :: Software Development :: Testing
-Development Status :: 5 - Production/Stable
 """.splitlines()
 
 from setuptools import setup
