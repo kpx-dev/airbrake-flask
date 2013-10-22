@@ -1,5 +1,5 @@
 from setuptools import setup
-from airbrake import __version__, __app_url__, __app_name__
+from airbrake.airbrake import __version__, __app_url__, __app_name__
 
 setup(
     name=__app_name__,
