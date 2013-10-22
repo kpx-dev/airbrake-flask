@@ -1,14 +1,16 @@
 language: python
 python:
   - "2.7"
+
 # command to install dependencies
 before_install:
  - sudo apt-get install --yes --force-yes libevent-dev
 
 install:
+  - python setup.py install
   - pip install -e .[test]
   - pip install coveralls --use-mirrors
-  - pip install requests==2.0.0
+
 # command to run tests
 script:
   - make test
