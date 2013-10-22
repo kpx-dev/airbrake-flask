@@ -1,30 +1,38 @@
 """
 This is a very bad Flask app, always raise Exception
 """
-from flask import Flask, request, got_request_exception
-import gevent
+import os
+from gevent import monkey
+monkey.patch_all()
+from flask import Flask, request, got_request_exception, session
 from airbrake import AirbrakeErrorHandler
 import sys
+import gevent
+
 
 app = Flask(__name__)
 EXCEPTION_MESSAGE = "bad_exception!"
 
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def root():
-    print "inside root /"
     raise Exception(EXCEPTION_MESSAGE)
 
     return 'this never return ok'
 
 
 def log_exception(sender, exception, **extra):
-    print "inside log_exception"
-    handler = AirbrakeErrorHandler(api_key="AIRBRAKE_KEY_1234",
+    handler = AirbrakeErrorHandler(api_key="AIRBRAKE_KEY_HERE",
                                    env_name='test',
-                                   request=request)
-    # handler.emit(exception=exception, exc_info=sys.exc_info())
+                                   request=request,
+                                   session=session
+                                   )
+
     gevent.spawn(handler.emit, exception, sys.exc_info())
 
 
 got_request_exception.connect(log_exception, app)
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=3000)

@@ -1,12 +1,12 @@
 import logging
 import traceback
-import urllib2
+import requests
 import os
 import sys
 from xml.etree.ElementTree import Element, tostring, SubElement
 
 _API_URL = 'https://airbrake.io/notifier_api/v2/notices'
-_DEFAULT_ENV_VARIABLES = []
+_DEFAULT_ENV_VARIABLES = ['PATH', 'USER', 'HOME']
 _DEFAULT_META_VARIABLES = ['HTTP_USER_AGENT', 'HTTP_COOKIE', 'REMOTE_ADDR',
                            'SERVER_NAME', 'SERVER_SOFTWARE']
 __app_name__ = 'airbrake-flask'
@@ -17,7 +17,8 @@ __app_url__ = 'https://github.com/kienpham2000/airbrake-flask'
 class AirbrakeErrorHandler(logging.Handler):
     def __init__(self, api_key, env_name, request, api_url=_API_URL,
                  timeout=30, env_variables=_DEFAULT_ENV_VARIABLES,
-                 meta_variables=_DEFAULT_META_VARIABLES):
+                 meta_variables=_DEFAULT_META_VARIABLES, session=None,
+                 root_path=None):
         logging.Handler.__init__(self)
         self.api_key = api_key
         self.api_url = api_url
@@ -25,13 +26,30 @@ class AirbrakeErrorHandler(logging.Handler):
         self.env_variables = env_variables
         self.meta_variables = meta_variables
         self.timeout = timeout
+        self.session = session
+        self.root_path = root_path
+
+        if self.root_path is None:
+            self.root_path = os.path.dirname(os.path.abspath(__file__))
 
         # handle Flask request object:
-        self.request = request
+        self.request = {
+            'url': request.url,
+            'path': request.path,
+            'method': request.method,
+            'values': request.values,
+            'json': request.json,
+            'headers': request.headers,
+            'remote_addr': request.remote_addr
+        }
 
     def emit(self, exception, exc_info=None):
-        self._send_message(self._generate_xml(exception=exception,
-                                              exc_info=exc_info))
+        headers = {"Content-Type": "text/xml"}
+        data = self._generate_xml(exception=exception, exc_info=exc_info)
+
+        status = requests.post(url=self.api_url, headers=headers, data=data)
+
+        return (status.status_code, status.text)
 
     def _generate_xml(self, exception, exc_info=None):
         # pass in exc_info for traceback to work with gevent:
@@ -47,34 +65,53 @@ class AirbrakeErrorHandler(logging.Handler):
 
         server_env = SubElement(xml, 'server-environment')
         SubElement(server_env, 'environment-name').text = self.env_name
+        SubElement(server_env, 'project-root').text = self.root_path
 
         request_xml = SubElement(xml, 'request')
-        SubElement(request_xml, 'url').text = self.request.url
+        SubElement(request_xml, 'url').text = self.request['url']
 
-        if self.request.path:
-            SubElement(request_xml, 'component').text = self.request.path
-            SubElement(request_xml, 'action').text = self.request.method
+        if self.request['path']:
+            SubElement(request_xml, 'component').text = self.request['path']
+            SubElement(request_xml, 'action').text = self.request['method']
 
-        if self.request.values:
-            params = SubElement(request_xml, 'params')
-            for key in self.request.values:
+        # check for session:
+        if self.session:
+            request_session = SubElement(request_xml, 'params')
+            for key in self.session:
+                SubElement(request_session, 'var', dict(key=key)).text = (str(
+                    self.session[key]))
+
+        # check for form, args or json data
+        params = SubElement(request_xml, 'params')
+        if self.request['values']:
+            for key in self.request['values']:
                 SubElement(params, 'var', dict(key=key)).text = (str(
-                    self.request.values.get(key)))
+                    self.request['values'].get(key)))
 
+        if self.request['json']:
+            for key in self.request['json']:
+                SubElement(params, 'var', dict(key=key)).text = (str(
+                    self.request['json'].get(key)))
+
+        # TODO: add self.meta_variables here, learn how to extract from Flask
         cgi_data = SubElement(request_xml, 'cgi-data')
         for key, value in os.environ.items():
             if key in self.env_variables:
                 SubElement(cgi_data, 'var', dict(key=key)).text = str(value)
+        if self.request['remote_addr']:
+            SubElement(cgi_data, 'var', dict(key='remote_addr')).text = str(
+                self.request['remote_addr'])
 
-        if self.request.headers:
-            for key, value in self.request.headers:
+        if self.request['headers']:
+            for key, value in self.request['headers']:
                 SubElement(cgi_data, 'var', dict(key=key)).text = str(value)
 
+        # setting class name
         error = SubElement(xml, 'error')
-        SubElement(error, 'class').text = exception.__class__.__name__ if \
-            exception else ''
+        SubElement(error, 'class').text = exception.__class__.__name__
         SubElement(error, 'message').text = str(exception)
 
+        # setting backtrace line
         backtrace = SubElement(error, 'backtrace')
         if trace is not None:
             for (pathname, lineno, func_name,
@@ -85,33 +122,3 @@ class AirbrakeErrorHandler(logging.Handler):
                                                                       text)))
 
         return tostring(xml)
-
-    def _send_http_request(self, headers, message):
-        request = urllib2.Request(self.api_url, message, headers)
-        try:
-            response = urllib2.urlopen(request, timeout=self.timeout)
-            status = response.getcode()
-        except urllib2.HTTPError as e:
-            status = e.code
-        return status
-
-    def _send_message(self, message):
-        headers = {"Content-Type": "text/xml"}
-        status = self._send_http_request(headers, message)
-        if status == 200:
-            return
-
-        exception_message = "Unexpected status code {0}".format(str(status))
-
-        if status == 403:
-            exception_message = "Unable to send using SSL"
-        elif status == 422:
-            exception_message = "Invalid XML sent: {0}".format(message)
-        elif status == 500:
-            exception_message = ("Destination server is unavailable. "
-                                 "Please check the remote server status.")
-        elif status == 503:
-            exception_message = ("Service unavailable. "
-                                 "You may be over your quota.")
-
-        return exception_message
