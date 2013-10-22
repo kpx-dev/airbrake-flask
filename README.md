@@ -17,10 +17,10 @@ To run tests, you need to install some required packages. Remember to activate y
 	$ pip install -e .[test]
 	
 	# run test
-	$ nosetests
+	$ make test
 	
 	# generate coverage report
-	$ nosetests --with-coverage --cover-html
+	$ make cover
 	
 
 Example Usage with gevent

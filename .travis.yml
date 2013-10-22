@@ -14,7 +14,6 @@ install:
 # command to run tests
 script:
   - make test
-  - make cover
   - coverage run setup.py nosetests --with-coverage --cover-package=airbrake
 after_success:
   - coveralls
