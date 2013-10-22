@@ -10,6 +10,7 @@ setup(
     license='LICENSE.txt',
     description='Airbrake client for Python Flask',
     long_description='Airbrake client for Python Flask',
+    install_requires=['requests==2.0.0'],
     extras_require={
         'test': [
             'nose',
@@ -19,5 +20,5 @@ setup(
             'Flask',
             'gevent'
         ]
-    },
+    }
 )

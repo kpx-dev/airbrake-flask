@@ -1,0 +1,8 @@
+[run]
+omit = ~/Envs/airbrake-flask/*
+	   env/*
+	   docs/*
+	   test/*
+	   deploy/*
+	   /System/*
+	   /usr/lib/*
