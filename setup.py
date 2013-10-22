@@ -3,6 +3,23 @@
 airbrake-flask is a fast library that use the amazing requests library to send
 error, exception messages to airbrake.io. You can use this library with the
 amazing gevent library to send your request asynchronously.
+
+Example Usage with gevent
+-------------------------
+from flask import Flask, request, got_request_exception
+from airbrake.airbrake import AirbrakeErrorHandler
+import gevent
+import sys
+
+app = Flask(__name__)
+ENV = ('ENV' in os.environ and os.environ['ENV']) or 'prod'
+
+def log_exception(error):
+    handler = AirbrakeErrorHandler(api_key="PUT_YOUR_AIRBRAKE_KEY_HERE",
+            env_name=ENV, request=request)
+    gevent.spawn(handler.emit, error, sys.exc_info())
+
+got_request_exception.connect(log_exception, app)
 """
 
 classifiers = """\
