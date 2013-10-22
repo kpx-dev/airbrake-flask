@@ -1,4 +1,4 @@
-from airbrake import AirbrakeErrorHandler
+from airbrake.airbrake import AirbrakeErrorHandler
 import os
 from flask.testing import FlaskClient
 import unittest

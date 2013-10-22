@@ -5,7 +5,7 @@ import os
 from gevent import monkey
 monkey.patch_all()
 from flask import Flask, request, got_request_exception, session
-from airbrake import AirbrakeErrorHandler
+from airbrake.airbrake import AirbrakeErrorHandler
 import sys
 import gevent
 

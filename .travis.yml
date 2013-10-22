@@ -7,7 +7,6 @@ before_install:
  - sudo apt-get install --yes --force-yes libevent-dev
 
 install:
-  - python setup.py install
   - pip install -e .[test]
   - pip install coveralls --use-mirrors
 
@@ -15,6 +14,6 @@ install:
 script:
   - make test
   - make cover
-  - coverage run --source=airbrake-flask setup.py nosetests
+  - coverage run --source=airbrake-flask setup.py nosetests -s -v --with-coverage --cover-html --cover-html-dir ./coverage
 after_success:
   - coveralls

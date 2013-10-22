@@ -26,7 +26,7 @@ To run tests, you need to install some required packages. Remember to activate y
 Example Usage with gevent
 -------------------------
 	from flask import Flask, request, got_request_exception
-	from airbrake import AirbrakeErrorHandler
+	from airbrake.airbrake import AirbrakeErrorHandler
 	import gevent
 	import sys
 		
