@@ -20,5 +20,6 @@ setup(
             'Flask',
             'gevent'
         ]
-    }
+    },
+    test_suite="tests"
 )

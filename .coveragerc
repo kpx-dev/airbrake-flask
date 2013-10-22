@@ -1,4 +1,5 @@
 [run]
+source = airbrake
 omit = ~/Envs/airbrake-flask/*
 	   env/*
 	   docs/*
@@ -6,3 +7,5 @@ omit = ~/Envs/airbrake-flask/*
 	   deploy/*
 	   /System/*
 	   /usr/lib/*
+	   */python?.?/*
+       */site-packages/nose/*
