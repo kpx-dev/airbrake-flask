@@ -3,7 +3,7 @@ airbrake-flask
 
 Airbrake client for Python Flask Microframework
 
-[![Build Status](https://travis-ci.org/kienpham2000/airbrake-flask.png?branch=master)](https://travis-ci.org/kienpham2000/airbrake-flask) [![Coverage Status](https://coveralls.io/repos/kienpham2000/airbrake-flask/badge.png?branch=master)](https://coveralls.io/r/kienpham2000/airbrake-flask?branch=master) [![Downloads](https://pypip.in/d/airbrake-flask/badge.png)](https://crate.io/package/airbrake-flask) [![Downloads](https://pypip.in/v/airbrake-flask/badge.png)](https://crate.io/package/airbrake-flask)
+[![Build Status](https://travis-ci.org/kienpham2000/airbrake-flask.png?branch=master)](https://travis-ci.org/kienpham2000/airbrake-flask) [![Coverage Status](https://coveralls.io/repos/kienpham2000/airbrake-flask/badge.png?branch=master)](https://coveralls.io/r/kienpham2000/airbrake-flask?branch=master) [![Downloads](https://pypip.in/d/airbrake-flask/badge.png)](https://crate.io/packages/airbrake-flask/) [![Downloads](https://pypip.in/v/airbrake-flask/badge.png)](https://crate.io/packages/airbrake-flask/)
 
 License
 -------
