@@ -8,6 +8,7 @@ before_install:
 install:
   - pip install -e .[test]
   - pip install coveralls --use-mirrors
+  - pip install requests==2.0.0
 # command to run tests
 script:
   - make test
