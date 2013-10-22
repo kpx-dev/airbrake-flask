@@ -4,14 +4,12 @@ import requests
 import os
 import sys
 from xml.etree.ElementTree import Element, tostring, SubElement
+from . import __app_name__, __version__, __app_url__
 
 _API_URL = 'https://airbrake.io/notifier_api/v2/notices'
 _DEFAULT_ENV_VARIABLES = ['PATH', 'USER', 'HOME']
 _DEFAULT_META_VARIABLES = ['HTTP_USER_AGENT', 'HTTP_COOKIE', 'REMOTE_ADDR',
                            'SERVER_NAME', 'SERVER_SOFTWARE']
-__app_name__ = 'airbrake-flask'
-__version__ = '0.0.4'
-__app_url__ = 'https://github.com/kienpham2000/airbrake-flask'
 
 
 class AirbrakeErrorHandler(logging.Handler):
