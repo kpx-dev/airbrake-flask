@@ -54,7 +54,7 @@ setup(
     license='MIT',
     description=doc[0],
     long_description='\n'.join(doc[2:]),
-    install_requires=['requests==2.0.0'],
+    install_requires=['requests==2.0.1'],
     extras_require={
         'test': [
             'nose',
