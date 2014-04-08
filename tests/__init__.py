@@ -22,6 +22,7 @@ class FakeRequest(object):
     method = None
     values = {"some_form_key": "some_form_value"}
     json = {"json_key": "json_value"}
+    data = '{"json_key": "json_value"}'
     headers = None
     remote_addr = 'localhost'
 
