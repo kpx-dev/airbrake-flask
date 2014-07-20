@@ -36,10 +36,15 @@ class AirbrakeErrorHandler(logging.Handler):
             'path': request.path,
             'method': request.method,
             'values': request.values,
-            'json': request.json,
+            'body': request.data,
             'headers': request.headers,
             'remote_addr': request.remote_addr
         }
+
+        try:
+            self.requests['json'] = request.json
+        except Exception, exc:
+            pass # Werkzeug couldn't parse json, ignored
 
     def emit(self, exception, exc_info=None):
         headers = {"Content-Type": "text/xml"}
@@ -79,14 +84,18 @@ class AirbrakeErrorHandler(logging.Handler):
                 SubElement(request_session, 'var', dict(key=key)).text = (str(
                     self.session[key]))
 
-        # check for form, args or json data
+        # check for form, args, body or json data
         params = SubElement(request_xml, 'params')
         if self.request['values']:
             for key in self.request['values']:
                 SubElement(params, 'var', dict(key=key)).text = (str(
                     self.request['values'].get(key)))
 
-        if self.request['json']:
+        if self.request['body']:
+            SubElement(params, 'var', dict(key='body')).text = (str(
+                self.request['body']))
+
+        if self.request.get('json'):
             for key in self.request['json']:
                 SubElement(params, 'var', dict(key=key)).text = (str(
                     self.request['json'].get(key)))
