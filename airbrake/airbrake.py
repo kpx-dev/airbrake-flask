@@ -43,7 +43,7 @@ class AirbrakeErrorHandler(logging.Handler):
 
         try:
             self.requests['json'] = request.json
-        except Exception, exc:
+        except Exception as exc:
             pass # Werkzeug couldn't parse json, ignored
 
     def emit(self, exception, exc_info=None):
