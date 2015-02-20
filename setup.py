@@ -49,7 +49,7 @@ setup(
     packages=['airbrake'],
     zip_safe=False,
     author='Kien Pham, Kane Kim',
-    author_email='kien@sendgrid.com',
+    author_email='kien@calolo.com',
     url=__app_url__,
     license='MIT',
     description=doc[0],
