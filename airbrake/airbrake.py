@@ -3,6 +3,7 @@ import traceback
 import requests
 import os
 import sys
+from six import text_type
 from xml.etree.ElementTree import Element, tostring, SubElement
 from . import __app_name__, __version__, __app_url__
 
@@ -54,6 +55,9 @@ class AirbrakeErrorHandler(logging.Handler):
 
         return (status.status_code, status.text)
 
+
+
+
     def _generate_xml(self, exception, exc_info=None):
         # pass in exc_info for traceback to work with gevent:
         _, _, trace = exc_info or sys.exc_info()
@@ -81,42 +85,42 @@ class AirbrakeErrorHandler(logging.Handler):
         if self.session:
             request_session = SubElement(request_xml, 'params')
             for key in self.session:
-                SubElement(request_session, 'var', dict(key=key)).text = (unicode(
+                SubElement(request_session, 'var', dict(key=key)).text = (text_type(
                     self.session[key]))
 
         # check for form, args, body or json data
         params = SubElement(request_xml, 'params')
         if self.request['values']:
             for key in self.request['values']:
-                SubElement(params, 'var', dict(key=key)).text = (unicode(
+                SubElement(params, 'var', dict(key=key)).text = (text_type(
                     self.request['values'].get(key)))
 
         if self.request['body']:
-            SubElement(params, 'var', dict(key='body')).text = (unicode(
+            SubElement(params, 'var', dict(key='body')).text = (text_type(
                 self.request['body']))
 
         if self.request.get('json'):
             for key in self.request['json']:
-                SubElement(params, 'var', dict(key=key)).text = (unicode(
+                SubElement(params, 'var', dict(key=key)).text = (text_type(
                     self.request['json'].get(key)))
 
         # TODO: add self.meta_variables here, learn how to extract from Flask
         cgi_data = SubElement(request_xml, 'cgi-data')
         for key, value in os.environ.items():
             if key in self.env_variables:
-                SubElement(cgi_data, 'var', dict(key=key)).text = unicode(value)
+                SubElement(cgi_data, 'var', dict(key=key)).text = text_type(value)
         if self.request['remote_addr']:
-            SubElement(cgi_data, 'var', dict(key='remote_addr')).text = unicode(
+            SubElement(cgi_data, 'var', dict(key='remote_addr')).text = text_type(
                 self.request['remote_addr'])
 
         if self.request['headers']:
             for key, value in self.request['headers']:
-                SubElement(cgi_data, 'var', dict(key=key)).text = unicode(value)
+                SubElement(cgi_data, 'var', dict(key=key)).text = text_type(value)
 
         # setting class name
         error = SubElement(xml, 'error')
         SubElement(error, 'class').text = exception.__class__.__name__
-        SubElement(error, 'message').text = unicode(exception)
+        SubElement(error, 'message').text = text_type(exception)
 
         # setting backtrace line
         backtrace = SubElement(error, 'backtrace')
@@ -124,7 +128,7 @@ class AirbrakeErrorHandler(logging.Handler):
             for (pathname, lineno, func_name,
                  text) in traceback.extract_tb(trace)[::-1]:
                 SubElement(backtrace, 'line', dict(file=pathname,
-                                                   number=unicode(lineno),
+                                                   number=text_type(lineno),
                                                    method='%s: %s' % (func_name,
                                                                       text)))
 
