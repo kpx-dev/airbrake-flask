@@ -17,6 +17,7 @@ class UnitTests(BaseTestCase):
 
         # check Flask request object info:
         assert_is_not_none(self.client.request)
+        assert_is_not_none(self.client.request['json'])
 
     def test_generate_xml(self):
         xml = self.client._generate_xml(exception=Exception('hola exception'))
